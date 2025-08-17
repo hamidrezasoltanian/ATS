@@ -11,6 +11,9 @@ async function build() {
     await fs.emptyDir(distDir);
     console.log('Cleaned dist directory.');
 
+    // Read API_KEY from the build environment
+    const apiKey = process.env.API_KEY || '';
+
     // 2. Build the TypeScript/React code
     await esbuild.build({
       entryPoints: ['index.tsx'],
@@ -19,7 +22,10 @@ async function build() {
       minify: true,
       sourcemap: true,
       loader: { '.tsx': 'tsx' },
-      define: { 'process.env.NODE_ENV': "'production'" },
+      define: { 
+        'process.env.NODE_ENV': "'production'",
+        'process.env.API_KEY': JSON.stringify(apiKey),
+      },
     });
     console.log('JavaScript bundled successfully.');
 
