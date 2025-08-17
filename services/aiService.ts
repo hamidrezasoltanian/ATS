@@ -1,6 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = process.env.API_KEY;
+// To prevent crashing when running without a build process,
+// we safely check for the API_KEY. The build process will replace
+// process.env.API_KEY with the actual key.
+let API_KEY: string | undefined;
+try {
+    API_KEY = process.env.API_KEY;
+} catch (e) {
+    API_KEY = undefined;
+}
+
 
 let ai: GoogleGenAI | null = null;
 if (API_KEY) {
@@ -11,7 +20,7 @@ const model = 'gemini-2.5-flash';
 
 const generateContent = async (prompt: string): Promise<string> => {
     if (!ai) {
-        return "خطا: کلید API برای سرویس هوش مصنوعی یافت نشد. لطفا از طریق پنل افزونه، کلید خود را در متغیرهای محیطی با نام API_KEY ثبت کنید.";
+        return "خطا: قابلیت هوش مصنوعی پیکربندی نشده است. برای فعال‌سازی، برنامه را با دستور build و با ارائه کلید API اجرا کنید.";
     }
     try {
         const response = await ai.models.generateContent({

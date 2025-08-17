@@ -462,8 +462,19 @@ const ApiKeyPanel: React.FC = () => {
     const [isKeySet, setIsKeySet] = useState(false);
 
     useEffect(() => {
-        // This check works because process.env.API_KEY is replaced by its value at build time.
-        setIsKeySet(!!process.env.API_KEY);
+        // Safely check for API key to prevent crash when not using the build process.
+        let keyAvailable = false;
+        try {
+            // The build process replaces process.env.API_KEY with the actual value.
+            // If it's a non-empty string, the key is set.
+            if (process.env.API_KEY) {
+                keyAvailable = true;
+            }
+        } catch (e) {
+            // process is not defined, so the key is not available.
+            keyAvailable = false;
+        }
+        setIsKeySet(keyAvailable);
     }, []);
 
     return (
